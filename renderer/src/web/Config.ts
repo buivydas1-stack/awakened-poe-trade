@@ -396,6 +396,9 @@ function upgradeConfig (_config: Config): Config {
   if (priceCheck.rememberCurrency === undefined) {
     priceCheck.rememberCurrency = false
   }
+  if (priceCheck.lockedModifierExclusions === undefined) {
+    priceCheck.lockedModifierExclusions = ''
+  }
 
   for (const widget of config.widgets) {
     if (widget.wmType === 'stash-search') {

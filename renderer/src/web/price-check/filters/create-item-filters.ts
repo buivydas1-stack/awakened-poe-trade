@@ -1,6 +1,6 @@
 import type { ItemFilters } from './interfaces'
 import { ParsedItem, ItemCategory, ItemRarity } from '@/parser'
-import { MAGIC_ONLY_OR_UNIQUE_ITEM, CONSUMABLE_CRAFTABLE_ITEM } from '@/parser/meta'
+import { CONSUMABLE_CRAFTABLE_ITEM } from '@/parser/meta'
 import { tradeTag } from '../trade/common'
 import { ModifierType } from '@/parser/modifiers'
 import { BaseType, ITEM_BY_REF } from '@/assets/data'
@@ -271,19 +271,13 @@ export function createFilters (
       value: 'magic',
       disabled: false
     }
-  } else if (
-    opts.exact &&
-    item.rarity === ItemRarity.Magic &&
-    !CONSUMABLE_CRAFTABLE_ITEM.has(item.category!) &&
-    !MAGIC_ONLY_OR_UNIQUE_ITEM.has(item.category!)
-  ) {
+  } else if (item.rarity === ItemRarity.Magic) {
     filters.rarity = {
       value: 'magic',
-      disabled: true
+      disabled: false
     }
   } else if (item.info.craftable && (
     item.rarity === ItemRarity.Normal ||
-    item.rarity === ItemRarity.Magic ||
     item.rarity === ItemRarity.Rare
   )) {
     filters.rarity = {

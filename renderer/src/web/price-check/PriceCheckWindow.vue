@@ -106,6 +106,7 @@ export default defineComponent({
         collapseListings: 'api',
         smartInitialSearch: true,
         lockedInitialSearch: true,
+        lockedModifierExclusions: '',
         activateStockFilter: false,
         builtinBrowser: false,
         hotkey: 'D',
