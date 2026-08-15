@@ -15,6 +15,7 @@ export function createPresets (
     collapseListings: 'app' | 'api'
     activateStockFilter: boolean
     searchStatRange: number
+    exactModifierPatterns: RegExp[]
     useEn: boolean
   }
 ): { presets: FilterPreset[], active: string } {

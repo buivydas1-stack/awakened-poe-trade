@@ -399,6 +399,9 @@ function upgradeConfig (_config: Config): Config {
   if (priceCheck.lockedModifierExclusions === undefined) {
     priceCheck.lockedModifierExclusions = ''
   }
+  if (priceCheck.exactModifierPatterns === undefined) {
+    priceCheck.exactModifierPatterns = ''
+  }
 
   for (const widget of config.widgets) {
     if (widget.wmType === 'stash-search') {

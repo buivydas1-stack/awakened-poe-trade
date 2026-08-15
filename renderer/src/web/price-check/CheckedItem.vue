@@ -70,7 +70,7 @@ import { AppConfig } from '@/web/Config'
 import { FilterPreset } from './filters/interfaces'
 import { PriceCheckWidget } from '../overlay/interfaces'
 import { useLeagues } from '@/web/background/Leagues'
-import { selectVisibleStats } from './filters/select-visible-stats'
+import { compileModifierPatterns, selectVisibleStats } from './filters/select-visible-stats'
 
 let _showSupportLinksCounter = 0
 
@@ -113,12 +113,15 @@ export default defineComponent({
 
     watch(() => props.item, (item, prevItem) => {
       const prevCurrency = (presets.value != null) ? itemFilters.value.trade.currency : undefined
+      const excludePatterns = compileModifierPatterns(widget.value.lockedModifierExclusions)
+      const exactPatterns = compileModifierPatterns(widget.value.exactModifierPatterns)
 
       const nextPresets = createPresets(item, {
         league: leagues.selectedId.value!,
         collapseListings: widget.value.collapseListings,
         activateStockFilter: widget.value.activateStockFilter,
         searchStatRange: widget.value.searchStatRange,
+        exactModifierPatterns: exactPatterns,
         useEn: AppConfig().useIntlSite,
         currency: (prevItem &&
           item.info.namespace === prevItem.info.namespace &&
@@ -126,9 +129,8 @@ export default defineComponent({
         ) ? prevCurrency : undefined
       })
 
-      if (props.advancedCheck) {
-        const activePreset = nextPresets.presets.find(preset => preset.id === nextPresets.active)!
-        selectVisibleStats(activePreset.stats, widget.value.lockedModifierExclusions)
+      for (const preset of nextPresets.presets) {
+        selectVisibleStats(preset.stats, excludePatterns)
       }
 
       presets.value = nextPresets

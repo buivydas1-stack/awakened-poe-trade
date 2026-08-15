@@ -15,6 +15,7 @@ import { StatBetter, CLIENT_STRINGS } from '@/assets/data'
 export interface FiltersCreationContext {
   readonly item: ParsedItem
   readonly searchInRange: number
+  readonly exactModifierPatterns: RegExp[]
   filters: StatFilter[]
   statsByType: StatCalculated[]
 }
@@ -22,7 +23,7 @@ export interface FiltersCreationContext {
 export function createExactStatFilters (
   item: ParsedItem,
   statsByType: StatCalculated[],
-  opts: { searchStatRange: number, mode?: 'props' | 'bulk' }
+  opts: { searchStatRange: number, exactModifierPatterns: RegExp[], mode?: 'props' | 'bulk' }
 ): StatFilter[] {
   if (
     item.mapBlighted ||
@@ -68,6 +69,7 @@ export function createExactStatFilters (
     searchInRange: (opts.mode !== 'props')
       ? Math.min(2, opts.searchStatRange)
       : opts.searchStatRange,
+    exactModifierPatterns: opts.exactModifierPatterns,
     filters: [],
     statsByType: statsByType.filter(calc => keepByType.includes(calc.type))
   }
@@ -79,7 +81,7 @@ export function createExactStatFilters (
   valdoBadMods(ctx)
 
   ctx.filters.push(
-    ...ctx.statsByType.map(mod => calculatedStatToFilter(mod, ctx.searchInRange, item))
+    ...ctx.statsByType.map(mod => calculatedStatToFilter(mod, ctx.searchInRange, item, ctx.exactModifierPatterns))
   )
 
   if (item.info.refName === 'Chronicle of Atzoatl') {
@@ -145,12 +147,14 @@ export function initUiModFilters (
   item: ParsedItem,
   opts: {
     searchStatRange: number
+    exactModifierPatterns: RegExp[]
   }
 ): StatFilter[] {
   const ctx: FiltersCreationContext = {
     item,
     filters: [],
     searchInRange: (item.rarity === ItemRarity.Normal) ? 100 : opts.searchStatRange,
+    exactModifierPatterns: opts.exactModifierPatterns,
     statsByType: item.statsByType.map(calc => {
       if (calc.type === ModifierType.Fractured && calc.stat.trade.ids[ModifierType.Explicit]) {
         return { ...calc, type: ModifierType.Explicit }
@@ -179,7 +183,7 @@ export function initUiModFilters (
   }
 
   ctx.filters.push(
-    ...ctx.statsByType.map(mod => calculatedStatToFilter(mod, ctx.searchInRange, item))
+    ...ctx.statsByType.map(mod => calculatedStatToFilter(mod, ctx.searchInRange, item, ctx.exactModifierPatterns))
   )
 
   if (item.isVeiled) {
@@ -194,7 +198,8 @@ export function initUiModFilters (
 export function calculatedStatToFilter (
   calc: StatCalculated,
   percent: number,
-  item: ParsedItem
+  item: ParsedItem,
+  exactModifierPatterns: RegExp[] = []
 ): StatFilter {
   const { stat, sources, type } = calc
   let filter: StatFilter
@@ -230,6 +235,10 @@ export function calculatedStatToFilter (
     sources: sources,
     roll: undefined,
     disabled: true
+  }
+
+  if (exactModifierPatterns.some(pattern => pattern.test(filter.text))) {
+    percent = 0
   }
 
   if (calc.stat.better === StatBetter.NotComparable) {

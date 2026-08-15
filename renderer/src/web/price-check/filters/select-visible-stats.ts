@@ -1,10 +1,7 @@
 import type { FilterOrGroup, StatFilter } from './interfaces'
 
-export function selectVisibleStats (
-  stats: FilterOrGroup[],
-  exclusions: string
-): void {
-  const excludePatterns = exclusions
+export function compileModifierPatterns (patterns: string): RegExp[] {
+  return patterns
     .split(/\r?\n/)
     .map(pattern => pattern.trim())
     .filter(Boolean)
@@ -15,7 +12,12 @@ export function selectVisibleStats (
         return []
       }
     })
+}
 
+export function selectVisibleStats (
+  stats: FilterOrGroup[],
+  excludePatterns: RegExp[]
+): void {
   const select = (filter: StatFilter) => {
     if (filter.hidden) return
     filter.disabled = excludePatterns.some(pattern => pattern.test(filter.text))

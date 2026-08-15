@@ -107,6 +107,7 @@ export default defineComponent({
         smartInitialSearch: true,
         lockedInitialSearch: true,
         lockedModifierExclusions: '',
+        exactModifierPatterns: '',
         activateStockFilter: false,
         builtinBrowser: false,
         hotkey: 'D',

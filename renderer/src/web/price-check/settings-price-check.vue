@@ -57,6 +57,13 @@
         :placeholder="t(':locked_modifier_exclusions_placeholder')" />
       <div class="mt-1 italic text-gray-500">{{ t(':locked_modifier_exclusions_hint') }}</div>
     </div>
+    <div class="mb-4">
+      <div class="mb-1">{{ t(':exact_modifier_patterns') }}</div>
+      <textarea v-model="exactModifierPatterns" rows="4"
+        class="rounded bg-gray-900 px-2 py-1 block w-full font-poe resize-y"
+        :placeholder="t(':exact_modifier_patterns_placeholder')" />
+      <div class="mt-1 italic text-gray-500">{{ t(':exact_modifier_patterns_hint') }}</div>
+    </div>
     <!-- <ui-checkbox class="mb-4"
       v-model="rememberCurrency">{{ t(':remember_currency') }}</ui-checkbox> -->
     <ui-checkbox class="mb-4"
@@ -143,6 +150,7 @@ export default defineComponent({
       smartInitialSearch: configModelValue(() => configWidget.value, 'smartInitialSearch'),
       lockedInitialSearch: configModelValue(() => configWidget.value, 'lockedInitialSearch'),
       lockedModifierExclusions: configModelValue(() => configWidget.value, 'lockedModifierExclusions'),
+      exactModifierPatterns: configModelValue(() => configWidget.value, 'exactModifierPatterns'),
       rememberCurrency: configModelValue(() => configWidget.value, 'rememberCurrency'),
       searchStatRange: computed<number>({
         get () {
