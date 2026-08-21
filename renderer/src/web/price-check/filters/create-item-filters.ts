@@ -381,6 +381,9 @@ export function createFilters (
       value: true,
       disabled: false
     }
+    if (item.category === ItemCategory.Flask && filters.itemLevel) {
+      filters.itemLevel.disabled = false
+    }
   }
 
   if (item.isVeiled) {
