@@ -16,11 +16,12 @@ export function compileModifierPatterns (patterns: string): RegExp[] {
 
 export function selectVisibleStats (
   stats: FilterOrGroup[],
-  excludePatterns: RegExp[]
+  excludePatterns: RegExp[],
+  selectByDefault = true
 ): void {
   const select = (filter: StatFilter) => {
     if (filter.hidden) return
-    filter.disabled = excludePatterns.some(pattern => pattern.test(filter.text))
+    filter.disabled = !selectByDefault || excludePatterns.some(pattern => pattern.test(filter.text))
   }
 
   for (const stat of stats) {

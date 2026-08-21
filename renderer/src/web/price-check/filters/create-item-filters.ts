@@ -379,7 +379,7 @@ export function createFilters (
   if (item.isUnidentified) {
     filters.unidentified = {
       value: true,
-      disabled: (item.rarity !== ItemRarity.Unique)
+      disabled: false
     }
   }
 

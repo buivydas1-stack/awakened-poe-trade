@@ -130,7 +130,11 @@ export default defineComponent({
       })
 
       for (const preset of nextPresets.presets) {
-        selectVisibleStats(preset.stats, excludePatterns)
+        selectVisibleStats(
+          preset.stats,
+          excludePatterns,
+          !item.isUnidentified && item.rarity !== ItemRarity.Normal
+        )
       }
 
       presets.value = nextPresets
