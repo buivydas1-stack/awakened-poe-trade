@@ -15,7 +15,7 @@ import { StatBetter, CLIENT_STRINGS } from '@/assets/data'
 export interface FiltersCreationContext {
   readonly item: ParsedItem
   readonly searchInRange: number
-  readonly exactModifierPatterns: RegExp[]
+  readonly exactModifierPatterns?: RegExp[]
   filters: StatFilter[]
   statsByType: StatCalculated[]
 }
@@ -199,7 +199,7 @@ export function calculatedStatToFilter (
   calc: StatCalculated,
   percent: number,
   item: ParsedItem,
-  exactModifierPatterns: RegExp[] = []
+  exactModifierPatterns: RegExp[] | undefined = []
 ): StatFilter {
   const { stat, sources, type } = calc
   let filter: StatFilter

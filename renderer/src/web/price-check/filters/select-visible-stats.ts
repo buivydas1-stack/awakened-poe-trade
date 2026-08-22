@@ -26,9 +26,9 @@ export function selectVisibleStats (
 
   for (const stat of stats) {
     if (stat.group === 'mercenary') {
-      select(stat.skill)
-      stat.supports.forEach(select)
-    } else {
+      select(stat.meta)
+      stat.stats.forEach(select)
+    } else if (stat.group === undefined) {
       select(stat)
     }
   }
