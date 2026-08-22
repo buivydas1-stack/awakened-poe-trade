@@ -133,7 +133,8 @@ export default defineComponent({
         selectVisibleStats(
           preset.stats,
           excludePatterns,
-          !item.isUnidentified && item.rarity !== ItemRarity.Normal
+          !item.isUnidentified && item.rarity !== ItemRarity.Normal,
+          item.isUnidentified
         )
       }
 

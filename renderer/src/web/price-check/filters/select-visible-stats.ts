@@ -17,10 +17,21 @@ export function compileModifierPatterns (patterns: string): RegExp[] {
 export function selectVisibleStats (
   stats: FilterOrGroup[],
   excludePatterns: RegExp[],
-  selectByDefault = true
+  selectByDefault = true,
+  selectBasePercentile = false
 ): void {
   const select = (filter: StatFilter) => {
     if (filter.hidden) return
+
+    if (selectBasePercentile && filter.tradeId.includes('item.base_percentile')) {
+      filter.disabled = false
+      if (filter.roll) {
+        filter.roll.min = Math.max(0, filter.roll.value - 1)
+        filter.roll.max = undefined
+      }
+      return
+    }
+
     filter.disabled = !selectByDefault || excludePatterns.some(pattern => pattern.test(filter.text))
   }
 
