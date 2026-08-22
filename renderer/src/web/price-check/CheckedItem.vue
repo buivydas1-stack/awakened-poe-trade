@@ -134,7 +134,7 @@ export default defineComponent({
           preset.stats,
           excludePatterns,
           !item.isUnidentified && item.rarity !== ItemRarity.Normal,
-          item.isUnidentified
+          item.isUnidentified || item.rarity === ItemRarity.Normal
         )
       }
 
