@@ -48,7 +48,7 @@
             <tr v-if="!result" :key="idx">
               <td colspan="100" class="text-transparent">***</td>
             </tr>
-            <tr v-else :key="result.id">
+            <tr v-else :key="result.id" :class="{ [$style.oldListing]: result.isOldListing }">
               <td class="px-2 whitespace-nowrap">
                 <span :class="{ 'line-through': result.priceCurrency === 'exalted' }">{{ result.priceAmount }} {{ result.priceCurrency }}</span>
                 <span v-if="result.listedTimes > 2" class="rounded px-1 text-gray-800 bg-gray-400 ml-1 -mr-2"><span class="font-sans">×</span> {{ result.listedTimes }}</span>
@@ -290,6 +290,10 @@ export default defineComponent({
   /* &.online {} */
   &.offline { @apply bg-red-600; }
   &.afk { @apply bg-orange-500; }
+}
+
+.oldListing {
+  background: rgba(185, 28, 28, 0.28) !important;
 }
 
 .stashListing {

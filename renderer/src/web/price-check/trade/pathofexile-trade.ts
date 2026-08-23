@@ -7,6 +7,7 @@ import { TradeResponse, Account, getTradeEndpoint, adjustRateLimits, RATE_LIMIT_
 import { stat, STAT_BY_REF_V2, pseudoStatByRef } from '@/assets/data'
 import { decodeFamilyFromSource as decodeMercenarySupports, SearchMode as MercSearchMode } from '../filters/pseudo/mercenary'
 import { RateLimiter } from './RateLimiter'
+import { isListingAtLeastOneDayOld } from './listing-age'
 import { ModifierType } from '@/parser/modifiers'
 import { Cache } from './Cache'
 
@@ -251,6 +252,7 @@ export interface PricingResult {
   quality?: string
   level?: string
   relativeDate: string
+  isOldListing: boolean
   priceAmount: number
   priceCurrency: string
   isMine: boolean
@@ -810,6 +812,7 @@ export async function requestResults (
       quality: result.item.properties?.find(prop => prop.type === 6)?.values[0][0],
       level: result.item.properties?.find(prop => prop.type === 5)?.values[0][0],
       relativeDate: DateTime.fromISO(result.listing.indexed).toRelative({ style: 'short' }) ?? '',
+      isOldListing: isListingAtLeastOneDayOld(result.listing.indexed),
       priceAmount: result.listing.price?.amount ?? 0,
       priceCurrency: result.listing.price?.currency ?? 'no price',
       hasNote: result.item.note != null,
