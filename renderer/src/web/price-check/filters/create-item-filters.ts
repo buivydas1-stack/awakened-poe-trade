@@ -383,7 +383,10 @@ export function createFilters (
     }
   }
 
-  if (item.category === ItemCategory.Flask && filters.itemLevel) {
+  if (filters.itemLevel && (
+    item.category === ItemCategory.Flask ||
+    (item.category === ItemCategory.Tincture && item.isUnidentified)
+  )) {
     filters.itemLevel.disabled = false
   }
 
