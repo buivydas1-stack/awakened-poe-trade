@@ -155,6 +155,8 @@ export function createFilters (
 
     if (item.mapBlighted) {
       filters.mapBlighted = { value: item.mapBlighted }
+    } else if (item.info.refName === 'Map') {
+      filters.mapBlighted = { value: false }
     }
 
     if (item.mapCompletionReward) {

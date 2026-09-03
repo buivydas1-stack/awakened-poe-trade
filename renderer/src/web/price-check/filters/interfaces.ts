@@ -65,7 +65,7 @@ export interface ItemFilters {
   gemLevel?: FilterNumeric
   mapTier?: FilterNumeric
   mapBlighted?: {
-    value: NonNullable<ParsedItem['mapBlighted']>
+    value: NonNullable<ParsedItem['mapBlighted']> | false
   }
   mapCompletionReward?: {
     name: string

@@ -66,6 +66,10 @@ export function statSourcesTotal (
   sources: StatSource[],
   mode: 'sum' | 'max' = 'sum'
 ): StatRoll | undefined {
+  if (sources.every(source => !source.contributes)) {
+    return undefined
+  }
+
   const fn = (mode === 'sum')
     ? (a: number, b: number) => a + b
     : (a: number, b: number) => Math.max(a, b)
@@ -106,7 +110,7 @@ export function translateStatWithRoll (
 
   const dp = (roll)
     ? calc.stat.dp ||
-      calc.sources.some(s => s.stat.stat.ref === calc.stat.ref && s.stat.roll!.dp)
+      calc.sources.some(s => s.stat.stat.ref === calc.stat.ref && s.stat.roll?.dp)
     : undefined
 
   return { string: translation.string, negate: translation.negate || false, dp: dp }
