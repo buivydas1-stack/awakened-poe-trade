@@ -147,6 +147,7 @@ export default defineComponent({
         doSearch.value = Boolean(
           (item.rarity === ItemRarity.Unique) ||
           (item.rarity === ItemRarity.Normal) ||
+          (item.rarity === ItemRarity.Rare) ||
           (presets.value.active === 'filters.preset_bulk') ||
           (item.mapCompletionReward) ||
           (item.category === ItemCategory.HeistContract) ||
