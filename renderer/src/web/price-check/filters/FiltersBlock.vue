@@ -29,8 +29,12 @@
         <filter-btn-logical v-for="influence of filters.influences" :key="influence.value"
           :filter="influence" :text="influence.value" :img="`/images/influence-${influence.value}.png`" />
       </template>
+      <filter-btn-logical v-if="filters.rarity?.value === 'normal'"
+        :filter="filters.rarity" :text="clientStrings.RARITY_NORMAL" />
       <filter-btn-logical v-if="filters.rarity?.value === 'magic'"
         :filter="filters.rarity" text="Magic" />
+      <filter-btn-logical v-if="filters.rarity?.value === 'rare'"
+        :filter="filters.rarity" :text="clientStrings.RARITY_RARE" />
       <filter-btn-logical v-if="filters.unidentified"
         :filter="filters.unidentified" :text="t('item.unidentified')" />
       <filter-btn-logical v-if="filters.veiled"
@@ -102,6 +106,7 @@ import FilterBtnLogical from './FilterBtnLogical.vue'
 import UnknownModifier from './UnknownModifier.vue'
 import { ItemFilters, FilterOrGroup } from './interfaces'
 import { ParsedItem, ItemRarity, ItemCategory } from '@/parser'
+import { CLIENT_STRINGS } from '@/assets/data'
 
 export default defineComponent({
   name: 'FiltersBlock',
@@ -152,6 +157,7 @@ export default defineComponent({
 
     return {
       t,
+      clientStrings: CLIENT_STRINGS,
       statsVisibility,
       showHidden,
       showFilterSources,

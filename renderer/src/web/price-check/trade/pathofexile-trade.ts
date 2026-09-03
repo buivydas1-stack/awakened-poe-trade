@@ -109,7 +109,7 @@ interface TradeRequest {
       type_filters?: {
         filters: {
           rarity?: {
-            option?: 'nonunique' | 'uniquefoil'
+            option?: 'normal' | 'magic' | 'rare' | 'nonunique' | 'uniquefoil'
           }
           category?: {
             option?: string

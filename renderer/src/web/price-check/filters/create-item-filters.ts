@@ -281,7 +281,9 @@ export function createFilters (
     item.rarity === ItemRarity.Rare
   )) {
     filters.rarity = {
-      value: 'nonunique',
+      value: CONSUMABLE_CRAFTABLE_ITEM.has(item.category!)
+        ? 'nonunique'
+        : item.rarity.toLowerCase(),
       disabled: false
     }
   }

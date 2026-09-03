@@ -77,6 +77,12 @@
         </tbody>
       </table>
     </div>
+    <div v-if="hasMore" class="pt-2 px-2 flex-shrink-0">
+      <button class="btn w-full disabled:opacity-50" :disabled="loadingMore" :aria-busy="loadingMore" @click="loadMore">
+        {{ loadingMore ? t('please_wait') : t(':load_more', [20]) }}
+      </button>
+      <p v-if="loadMoreError" class="mt-1 text-red-400" role="alert">Error: {{ loadMoreError }}</p>
+    </div>
   </div>
   <ui-error-box v-else>
     <template #name>{{ t(':error') }}</template>
@@ -113,9 +119,13 @@ const MIN_GROUPED = 10
 function useTradeApi () {
   let searchId = 0
   let collapseMerchant = false
+  let fetchNextPage: (() => Promise<void>) | undefined
   const error = shallowRef<string | null>(null)
   const searchResult = shallowRef<SearchResult | null>(null)
   const fetchResults = shallowRef<PricingResult[]>([])
+  const hasMore = shallowRef(false)
+  const loadingMore = shallowRef(false)
+  const loadMoreError = shallowRef<string | null>(null)
 
   const groupedResults = computed(() => {
     const out: Array<PricingResult & { listedTimes: number }> = []
@@ -150,14 +160,17 @@ function useTradeApi () {
   })
 
   async function search (filters: ItemFilters, stats: FilterOrGroup[]) {
+    const _searchId = ++searchId
     try {
-      searchId += 1
       error.value = null
       searchResult.value = null
+      fetchNextPage = undefined
+      hasMore.value = false
+      loadingMore.value = false
+      loadMoreError.value = null
       const _fetchResults: PricingResult[] = shallowReactive([])
       fetchResults.value = _fetchResults
 
-      const _searchId = searchId
       const request = createTradeRequest(filters, stats)
       const _searchResult = await requestTradeResultList(request, filters.trade.league)
       if (_searchId !== searchId) {
@@ -180,7 +193,16 @@ function useTradeApi () {
         await Promise.all([r1, r2])
       }
 
-      let fetched = 20
+      let fetched = Math.min(20, _searchResult.result.length)
+      async function fetchNextBatch (): Promise<void> {
+        if (_searchId !== searchId) return
+        const ids = _searchResult.result.slice(fetched, fetched + 10)
+        const results = await requestResults(_searchResult.id, ids, { accountName: AppConfig().accountName })
+        if (_searchId !== searchId) return
+        _fetchResults.push(...results)
+        fetched += ids.length
+      }
+
       async function fetchMore (): Promise<void> {
         if (_searchId !== searchId) return
         const totalGrouped = groupedResults.value.length
@@ -191,19 +213,49 @@ function useTradeApi () {
           fetched < _searchResult.result.length &&
           fetched < API_FETCH_LIMIT
         ) {
-          await requestResults(_searchResult.id, _searchResult.result.slice(fetched, fetched + 10), { accountName: AppConfig().accountName })
-            .then(results => { _fetchResults.push(...results) })
-          fetched += 10
+          await fetchNextBatch()
           return fetchMore()
         }
       }
-      return fetchMore()
+      await fetchMore()
+      if (_searchId !== searchId) return
+      hasMore.value = fetched < _searchResult.result.length
+      fetchNextPage = async () => {
+        const end = Math.min(fetched + SHOW_RESULTS, _searchResult.result.length)
+        while (fetched < end) {
+          if (_searchId !== searchId) return
+          await fetchNextBatch()
+          if (_searchId === searchId) {
+            hasMore.value = fetched < _searchResult.result.length
+          }
+        }
+      }
     } catch (err) {
-      error.value = (err as Error).message
+      if (_searchId === searchId) {
+        error.value = (err as Error).message
+      }
     }
   }
 
-  return { error, searchResult, groupedResults, search }
+  async function loadMore () {
+    if (!hasMore.value || loadingMore.value || !fetchNextPage) return
+    const _searchId = searchId
+    loadingMore.value = true
+    loadMoreError.value = null
+    try {
+      await fetchNextPage()
+    } catch (err) {
+      if (_searchId === searchId) {
+        loadMoreError.value = (err as Error).message
+      }
+    } finally {
+      if (_searchId === searchId) {
+        loadingMore.value = false
+      }
+    }
+  }
+
+  return { error, searchResult, groupedResults, search, hasMore, loadingMore, loadMoreError, loadMore }
 }
 
 export default defineComponent({
@@ -230,7 +282,7 @@ export default defineComponent({
       slowdown.reset(item)
     }, { immediate: true })
 
-    const { error, searchResult, groupedResults, search } = useTradeApi()
+    const { error, searchResult, groupedResults, search, hasMore, loadingMore, loadMoreError, loadMore } = useTradeApi()
 
     const showBrowser = inject<(url: string) => void>('builtin-browser')!
 
@@ -259,6 +311,10 @@ export default defineComponent({
       }),
       execSearch: () => { search(props.filters, props.stats) },
       error,
+      hasMore,
+      loadingMore,
+      loadMoreError,
+      loadMore,
       showSeller: computed(() => widget.value.showSeller),
       makeTradeLink,
       openTradeLink () {

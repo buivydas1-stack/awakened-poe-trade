@@ -295,6 +295,7 @@
     "new_mods_icon": "Show icon for new mods"
   },
   "trade_result": {
+    "load_more": "Load {0} more",
     "error" :"Trade site request failed",
     "matched" :"Matched: {0}",
     "trade" :"Trade",
